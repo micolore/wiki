@@ -1,0 +1,167 @@
+created: 20200228025947956
+draft.of: 外包ip项目代码分析
+draft.title: 外包ip项目代码分析
+modified: 20200302074201558
+tags: 
+title: Draft of '外包ip项目代码分析'
+type: text/vnd.tiddlywiki
+
+! 代码架构
+: 工作机<->ChanelServer（IndexServer）<->客户端
+
+* 工作机与服务器怎么进行交互的？
+```
+2020-02-28 13:47:10.973 [remote-server-connector] INFO  c.m.socket.socks.SocksMessageHandler - context[ChannelContext:/127.0.0.1:1081] accepted.
+2020-02-28 13:47:10.973 [remote-server-connector] INFO  com.mooyv.socket.NioSocketClient - connect server:java.nio.channels.SocketChannel[connected local=/127.0.0.1:60773 remote=/127.0.0.1:1081] finish
+2020-02-28 13:47:10.982 [remote-server-connector] INFO  c.m.socket.socks.SocksMessageHandler - req:[[5 2 0 2 ]]
+2020-02-28 13:47:10.982 [remote-server-connector] INFO  c.m.socket.socks.SocksMessageHandler - resp:[[5 0 ]]
+2020-02-28 13:47:10.983 [remote-server-connector] INFO  c.m.socket.socks.SocksMessageHandler - req:[[5 1 0 1 b6 3d c8 7 1 bb ]]
+2020-02-28 13:47:10.983 [remote-server-connector] INFO  com.mooyv.socket.NioSocketClient - begin to connect server:/182.61.200.7:443
+2020-02-28 13:47:11.021 [remote-server-connector] INFO  c.m.socket.socks.SocksMessageHandler - resp:[[5 0 0 1 b6 3d c8 7 1 bb ]]
+2020-02-28 13:47:11.022 [remote-server-connector] INFO  com.mooyv.socket.NioSocketClient - connect server:java.nio.channels.SocketChannel[connected local=/192.168.1.103:60774 remote=/182.61.200.7:443] finish
+2020-02-28 13:47:11.022 [SessionPool selector] INFO  com.mooyv.socket.socks.SessionPool - session begin transfer:[socksVer=5, isValid=true, client:ChannelContext:/127.0.0.1:1081, remote:ChannelContext:/182.61.200.7:443]
+2020-02-28 13:47:11.276 [session-pool-worker-1] INFO  c.m.socket.channel.ChannelContext - channel ChannelContext:/127.0.0.1:1081 closed.
+2020-02-28 13:47:11.276 [session-pool-worker-1] INFO  c.m.socket.channel.ChannelContext - channel ChannelContext:/182.61.200.7:443 closed.
+2020-02-28 13:47:11.277 [session-pool-worker-1] INFO  c.m.socket.socks.session.SocksPipe - this pipe SocksPipe [ChannelContext:/127.0.0.1:1081->ChannelContext:/182.61.200.7:443] is closed.
+2020-02-28 13:47:11.277 [session-pool-worker-1] WARN  com.mooyv.socket.socks.SessionPool - pipe:SocksPipe [ChannelContext:/127.0.0.1:1081->ChannelContext:/182.61.200.7:443] transfer end and closed, remain pipe count:0 ,session count:0
+
+```
+
+* 客户端与服务器怎么进行交互的？
+
+```
+2020-02-28 13:47:10.617 [main] INFO  com.mooyv.socket.socks.SessionPool - SessionPool started.
+2020-02-28 13:47:10.715 [main] INFO  c.m.proxy.client.ClientProxyManager - logined.
+2020-02-28 13:47:10.731 [main] INFO  c.m.proxy.client.ClientProxyManager - query proxy list, size:1
+2020-02-28 13:47:10.737 [main] INFO  c.m.proxy.client.ClientProxyServer - proxy server started at[/127.0.0.1:52001]
+2020-02-28 13:47:10.981 [SessionPool selector] INFO  com.mooyv.socket.socks.SessionPool - session begin transfer:[socksVer=0, isValid=false, client:ChannelContext:/127.0.0.1:60771, remote:ChannelContext:/127.0.0.1:1081]
+<!DOCTYPE html>
+<!--STATUS OK--><html> <head><meta http-equiv=content-type content=text/html;charset=utf-8><meta http-equiv=X-UA-Compatible content=IE=Edge><meta content=always name=referrer><link rel=stylesheet type=text/css href=https://ss1.bdstatic.com/5eN1bjq8AAUYm2zgoY3K/r/www/cache/bdorz/baidu.min.css><title>百度一下，你就知道</title></head> <body link=#0000cc> <div id=wrapper> <div id=head> <div class=head_wrapper> <div class=s_form> <div class=s_form_wrapper> <div id=lg> <img hidefocus=true src=//www.baidu.com/img/bd_logo1.png width=270 height=129> </div> <form id=form name=f action=//www.baidu.com/s class=fm> <input type=hidden name=bdorz_come value=1> <input type=hidden name=ie value=utf-8> <input type=hidden name=f value=8> <input type=hidden name=rsv_bp value=1> <input type=hidden name=rsv_idx value=1> <input type=hidden name=tn value=baidu><span class="bg s_ipt_wr"><input id=kw name=wd class=s_ipt value maxlength=255 autocomplete=off autofocus=autofocus></span><span class="bg s_btn_wr"><input type=submit id=su value=百度一下 class="bg s_btn" autofocus></span> </form> </div> </div> <div id=u1> <a href=http://news.baidu.com name=tj_trnews class=mnav>新闻</a> <a href=https://www.hao123.com name=tj_trhao123 class=mnav>hao123</a> <a href=http://map.baidu.com name=tj_trmap class=mnav>地图</a> <a href=http://v.baidu.com name=tj_trvideo class=mnav>视频</a> <a href=http://tieba.baidu.com name=tj_trtieba class=mnav>贴吧</a> <noscript> <a href=http://www.baidu.com/bdorz/login.gif?login&amp;tpl=mn&amp;u=http%3A%2F%2Fwww.baidu.com%2f%3fbdorz_come%3d1 name=tj_login class=lb>登录</a> </noscript> <script>document.write('<a href="http://www.baidu.com/bdorz/login.gif?login&tpl=mn&u='+ encodeURIComponent(window.location.href+ (window.location.search === "" ? "?" : "&")+ "bdorz_come=1")+ '" name="tj_login" class="lb">登录</a>');
+                </script> <a href=//www.baidu.com/more/ name=tj_briicon class=bri style="display: block;">更多产品</a> </div> </div> </div> <div id=ftCon> <div id=ftConw> <p id=lh> <a href=http://home.baidu.com>关于百度</a> <a href=http://ir.baidu.com>About Baidu</a> </p> <p id=cp>&copy;2017&nbsp;Baidu&nbsp;<a href=http://www.baidu.com/duty/>使用百度前必读</a>&nbsp; <a href=http://jianyi.baidu.com/ class=cp-feedback>意见反馈</a>&nbsp;京ICP证030173号&nbsp; <img src=//www.baidu.com/img/gs.gif> </p> </div> </div> </div> </body> </html>
+
+java.io.IOException: No such file or directory
+2020-02-28 13:47:11.275 [main] INFO  c.m.socket.channel.ChannelContext - channel ChannelContext:/127.0.0.1:60771 closed.
+2020-02-28 13:47:11.276 [main] INFO  c.m.socket.channel.ChannelContext - channel ChannelContext:/127.0.0.1:1081 closed.
+	at sun.nio.ch.NativeThread.signal(Native Method)
+	at sun.nio.ch.ServerSocketChannelImpl.implCloseSelectableChannel(ServerSocketChannelImpl.java:292)
+	at java.nio.channels.spi.AbstractSelectableChannel.implCloseChannel(AbstractSelectableChannel.java:234)
+	at java.nio.channels.spi.AbstractInterruptibleChannel.close(AbstractInterruptibleChannel.java:115)
+	at com.mooyv.proxy.client.ClientProxyServer.stop(ClientProxyServer.java:173)
+	at com.mooyv.proxy.client.ClientProxy.closeServer(ClientProxy.java:29)
+	at client.ProxyTest.testURLConnectionProxy(ProxyTest.java:73)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:44)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:15)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:41)
+	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:20)
+	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:263)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:69)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:48)
+	at org.junit.runners.ParentRunner$3.run(ParentRunner.java:231)
+	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:60)
+	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:229)
+	at org.junit.runners.ParentRunner.access$000(ParentRunner.java:50)
+	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:222)
+	at org.junit.runners.ParentRunner.run(ParentRunner.java:292)
+	at org.eclipse.jdt.internal.junit4.runner.JUnit4TestReference.run(JUnit4TestReference.java:89)
+	at org.eclipse.jdt.internal.junit.runner.TestExecution.run(TestExecution.java:41)
+	at org.eclipse.jdt.internal.junit.runner.RemoteTestRunner.runTests(RemoteTestRunner.java:541)
+	at org.eclipse.jdt.internal.junit.runner.RemoteTestRunner.runTests(RemoteTestRunner.java:763)
+	at org.eclipse.jdt.internal.junit.runner.RemoteTestRunner.run(RemoteTestRunner.java:463)
+	at org.eclipse.jdt.internal.junit.runner.RemoteTestRunner.main(RemoteTestRunner.java:209)
+
+```
+
+```
+2020-02-28 18:01:08.541 [server-message-scheduler] INFO  com.mooyv.socket.NioSocketServer - channel ChannelContext:/127.0.0.1:50525 registed.
+2020-02-28 18:01:08.681 [Worker-2] INFO  c.m.socket.channel.ChannelContext - channel ChannelContext:/127.0.0.1:50525 closed.
+2020-02-28 18:01:08.696 [server-message-scheduler] INFO  com.mooyv.socket.NioSocketServer - channel ChannelContext:/127.0.0.1:50526 registed.
+2020-02-28 18:02:59.696 [server-message-scheduler] INFO  com.mooyv.socket.NioSocketServer - channel ChannelContext:/127.0.0.1:50995 registed.
+2020-02-28 18:03:00.054 [server-message-scheduler] INFO  com.mooyv.socket.NioSocketServer - channel ChannelContext:/127.0.0.1:50997 registed.
+2020-02-28 18:03:00.066 [server-message-scheduler] INFO  com.mooyv.socket.NioSocketServer - channel ChannelContext:/127.0.0.1:50998 registed.
+2020-02-28 18:03:00.070 [Worker-3] INFO  c.m.proxy.server.socks.worker.Worker - matched session[[socksVer=0, isValid=false, client:ChannelContext:/127.0.0.1:50997, remote:ChannelContext:/127.0.0.1:50998]] and begin transfer
+2020-02-28 18:03:00.075 [SessionPool selector] INFO  com.mooyv.socket.socks.SessionPool - session begin transfer:[socksVer=0, isValid=false, client:ChannelContext:/127.0.0.1:50997, remote:ChannelContext:/127.0.0.1:50998]
+2020-02-28 18:03:00.382 [session-pool-worker-4] INFO  c.m.socket.channel.ChannelContext - channel ChannelContext:/127.0.0.1:50997 closed.
+2020-02-28 18:03:00.382 [session-pool-worker-4] INFO  c.m.socket.channel.ChannelContext - channel ChannelContext:/127.0.0.1:50998 closed.
+2020-02-28 18:03:00.382 [session-pool-worker-4] INFO  c.m.socket.socks.session.SocksPipe - this pipe SocksPipe [ChannelContext:/127.0.0.1:50997->ChannelContext:/127.0.0.1:50998] is closed.
+2020-02-28 18:03:00.383 [session-pool-worker-4] WARN  com.mooyv.socket.socks.SessionPool - pipe:SocksPipe [ChannelContext:/127.0.0.1:50997->ChannelContext:/127.0.0.1:50998] transfer end and closed, remain pipe count:0 ,session count:0
+2020-02-28 18:03:00.747 [server-message-scheduler] INFO  c.m.socket.channel.ChannelContext - channel ChannelContext:/127.0.0.1:50995 closed.
+2020-02-28 18:03:00.749 [server-message-scheduler] ERROR c.m.p.s.socks.ServerMessageHandler - channel error
+com.mooyv.socket.exception.TransferEndException: ChannelContext:/127.0.0.1:50995
+	at com.mooyv.socket.NioSocketServer.doRead(NioSocketServer.java:195)
+	at com.mooyv.socket.NioSocketServer.dispatch(NioSocketServer.java:98)
+	at com.mooyv.socket.AbsNioSelector.run(AbsNioSelector.java:64)
+	at java.lang.Thread.run(Thread.java:748)
+2020-02-28 18:03:00.749 [server-message-scheduler] INFO  c.m.socket.channel.ChannelContext - channel ChannelContext:/127.0.0.1:50995 closed.
+
+```
+: 请求了5次，创建了五个端口。
+连接登陆indexServer、服务器返回channelServer的信息
+
+
+* 服务器是怎么进行处理(转发、传输)两边的请求的？
+
+```
+2020-02-28 13:47:10.629 [server-message-scheduler] INFO  com.mooyv.socket.NioSocketServer - channel ChannelContext:/127.0.0.1:60770 registed.
+2020-02-28 13:47:10.970 [server-message-scheduler] INFO  com.mooyv.socket.NioSocketServer - channel ChannelContext:/127.0.0.1:60772 registed.
+2020-02-28 13:47:10.973 [server-message-scheduler] INFO  com.mooyv.socket.NioSocketServer - channel ChannelContext:/127.0.0.1:60773 registed.
+2020-02-28 13:47:10.973 [Worker-1] INFO  c.m.proxy.server.socks.worker.Worker - matched session[[socksVer=0, isValid=false, client:ChannelContext:/127.0.0.1:60772, remote:ChannelContext:/127.0.0.1:60773]] and begin transfer
+2020-02-28 13:47:10.974 [SessionPool selector] INFO  com.mooyv.socket.socks.SessionPool - session begin transfer:[socksVer=0, isValid=false, client:ChannelContext:/127.0.0.1:60772, remote:ChannelContext:/127.0.0.1:60773]
+2020-02-28 13:47:11.276 [session-pool-worker-3] INFO  c.m.socket.channel.ChannelContext - channel ChannelContext:/127.0.0.1:60772 closed.
+2020-02-28 13:47:11.276 [session-pool-worker-3] INFO  c.m.socket.channel.ChannelContext - channel ChannelContext:/127.0.0.1:60773 closed.
+2020-02-28 13:47:11.276 [session-pool-worker-3] INFO  c.m.socket.socks.session.SocksPipe - this pipe SocksPipe [ChannelContext:/127.0.0.1:60772->ChannelContext:/127.0.0.1:60773] is closed.
+2020-02-28 13:47:11.276 [session-pool-worker-3] WARN  com.mooyv.socket.socks.SessionPool - pipe:SocksPipe [ChannelContext:/127.0.0.1:60772->ChannelContext:/127.0.0.1:60773] transfer end and closed, remain pipe count:0 ,session count:0
+2020-02-28 13:47:11.642 [server-message-scheduler] INFO  c.m.socket.channel.ChannelContext - channel ChannelContext:/127.0.0.1:60770 closed.
+2020-02-28 13:47:11.642 [server-message-scheduler] ERROR c.m.p.s.socks.ServerMessageHandler - channel error
+com.mooyv.socket.exception.TransferEndException: ChannelContext:/127.0.0.1:60770
+	at com.mooyv.socket.NioSocketServer.doRead(NioSocketServer.java:195)
+	at com.mooyv.socket.NioSocketServer.dispatch(NioSocketServer.java:98)
+	at com.mooyv.socket.AbsNioSelector.run(AbsNioSelector.java:64)
+	at java.lang.Thread.run(Thread.java:748)
+2020-02-28 13:47:11.642 [server-message-scheduler] INFO  c.m.socket.channel.ChannelContext - channel ChannelContext:/127.0.0.1:60770 closed.
+
+```
+* 与之前go的版本的区别在哪里
+
+! 问题
+*  就是采用这种架构，不是go版本那种双服务器的，怎么进行翻墙呢
+*  socks加密的部分好像没有啊
+:    不然到时候what's app这种网站不能直接连的    
+
+*  Exexecutors 工作原理
+```
+	private ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
+                @Override
+		public Thread newThread(Runnable r) {
+			Thread thread = new Thread(r,"client-heartbeat-thread");
+			thread.setDaemon(true);
+			return thread;
+		}
+
+```
+* 连接indexSertver 需要 用户名以及密码，然后登陆，查询可以使用的代理服务器数量，然后进行心跳检测
+
+* 无论哪种实现方式（go、java）我感觉他们的原理都是一样的，包括客户端，只是我目前还没有完全弄清楚这里面的相关知识点   
+
+ * 如果没有加密等相关操作，只使用socks代理的话，那好像是不能进行翻墙的
+ : 那就是以目前的代码可能无法进行翻墙，这也就解释了之前的客户端以及服务端为什么都嵌入了shardsocks的代码
+
+* shardowsocks 与socks 的核心区别在什么地方？
+
+* GFW在哪一层处理的特征识别
+   也就是为什么加密就可以在一定程度上避免被处理？ss是在哪一层进行的加密操作呢
+
+
+
+
+
+
+
+
+
+
+
+
